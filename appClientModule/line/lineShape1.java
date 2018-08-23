@@ -30,6 +30,7 @@ public class lineShape1 extends Shape3D {
         LineAttributes la = new LineAttributes();  
           la.setLineWidth(5.0f);  
           la.setLineAntialiasingEnable(true);  
+          
         Appearance ap = new Appearance();  
          ap.setLineAttributes(la);  
         this.setGeometry(line);  

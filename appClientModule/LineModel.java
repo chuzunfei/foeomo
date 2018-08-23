@@ -47,17 +47,16 @@ public class LineModel extends JPanel implements MouseListener {
 	    jPanel.setLayout(new GridLayout());
 	    JScrollPane sp = new JScrollPane(table);
 	    jPanel.add(sp);
-	    contentPane.add(jPanel);
 	    JDialog jdialog = new JDialog();
 	    jdialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 	    jdialog.setContentPane(jPanel);
 
 	    jdialog.pack();
 	    jdialog.setVisible(true);
-	    jdialog.addWindowListener(new WindowAdapter()  
-        {  
-            public void windowClosing(WindowEvent e)  
-            {  
+	    jdialog.addWindowListener(new WindowAdapter()
+        {
+            public void windowClosing(WindowEvent e)
+            {
                 System.out.println("触发windowClosing事件"); 
                 TableModel model = table.getModel();
 					

@@ -212,13 +212,13 @@ public class OrientedTest extends Applet {
 
     public void init() {
         // the paths to the image files for an applet
-        earthImage = Resources.getResource("resources/images/earth.jpg");
+        earthImage = Resources.getResource("/resources/images/earth.jpg");
         if (earthImage == null) {
             System.err.println("resources/images/earth.jpg not found");
             System.exit(1);
         }
 
-        stoneImage = Resources.getResource("resources/images/stone.jpg");
+        stoneImage = Resources.getResource("/resources/images/stone.jpg");
         if (stoneImage == null) {
             System.err.println("resources/images/stone.jpg not found");
             System.exit(1);
@@ -287,13 +287,13 @@ public class OrientedTest extends Applet {
         java.net.URL earthURL = null;
 	java.net.URL stoneURL = null;
                 
-        earthURL = Resources.getResource("resources/images/earth.jpg");
+        earthURL = Resources.getResource("/resources/images/earth.jpg");
         if (earthURL == null) {
             System.err.println("resources/images/earth.jpg not found");
             System.exit(1);
         }
 
-        stoneURL = Resources.getResource("resources/images/stone.jpg");
+        stoneURL = Resources.getResource("/resources/images/stone.jpg");
         if (stoneURL == null) {
             System.err.println("resources/images/stone.jpg not found");
             System.exit(1);
