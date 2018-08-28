@@ -124,7 +124,7 @@ public class MyMousePickBehavior extends PickMouseBehavior{
   	        mater.setDiffuseColor(new Color3f(Color.red));
   	        appear.setMaterial(mater);
   	        shape.setAppearance(appear);
-  	        jta.setText(getDataString());
+//  	        jta.setText(getDataString());
     	}else{
     		data[getXintValue(x)][getYintValue(y)]=data[getXintValue(x)][getYintValue(y)] & (~getZintValue(z));
     		shape.setName( str[0]+","+str[1]+","+str[2]+","+0);

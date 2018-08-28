@@ -79,17 +79,17 @@ public class LineModel extends JPanel implements MouseListener {
 						}
 						
 						
-						line.getEndpoints().add(point);
+//						line.getEndpoints().add(point);
 					}
             }  
   
             public void windowClosed(WindowEvent e)  
             {  
-            	BranchGroup scene = createSceneGraph(line);  
-		        SimpleUniverse u = new SimpleUniverse(jp);  
-		        u.getViewingPlatform().setNominalViewingTransform();  
-		        u.addBranchGraph(scene); 
-		        contentPane.remove(jPanel);
+//            	BranchGroup scene = createSceneGraph(line);  
+//		        SimpleUniverse u = new SimpleUniverse(jp);  
+//		        u.getViewingPlatform().setNominalViewingTransform();  
+//		        u.addBranchGraph(scene); 
+//		        contentPane.remove(jPanel);
             }  
         });
 		

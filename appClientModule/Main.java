@@ -25,9 +25,11 @@ import java.util.Vector;
 import javax.media.j3d.Alpha;
 import javax.media.j3d.AmbientLight;
 import javax.media.j3d.Appearance;
+import javax.media.j3d.Background;
 import javax.media.j3d.BoundingSphere;
 import javax.media.j3d.BranchGroup;
 import javax.media.j3d.Canvas3D;
+import javax.media.j3d.ColoringAttributes;
 import javax.media.j3d.DirectionalLight;
 import javax.media.j3d.Font3D;
 import javax.media.j3d.FontExtrusion;
@@ -91,7 +93,6 @@ public class Main extends JFrame {
 	JLabel labelY = new JLabel("0");
 	JLabel labelZ = new JLabel("0");
 	static GraphicsConfiguration gc = SimpleUniverse.getPreferredConfiguration();
-	DrawPanel jp = new DrawPanel();
 	SimpleUniverse u = null;
 
 	/**
@@ -265,10 +266,11 @@ public class Main extends JFrame {
 //
 //		// setClosable(true);
 //
+		panel.setBackground(Color.BLUE);
 		draw3d(panel, line);
 
 		contentPane.add(panel, BorderLayout.CENTER);
-
+		System.out.printf("contentPane,height:%f, width:%d \n",contentPane.getMaximumSize().getHeight(),contentPane.getWidth());
 	}
 
 	private void draw3d(JPanel panel, Line line) {
@@ -291,7 +293,7 @@ public class Main extends JFrame {
 		JCanvas3D canvas = new JCanvas3D(new GraphicsConfigTemplate3D());
 		canvas.setResizeMode(JCanvas3D.RESIZE_IMMEDIATELY);
 		Component comp = canvas;
-
+		System.out.printf("canvas,height:%f, width:%d \n",canvas.getMaximumSize().getHeight(),canvas.getWidth());
 		Dimension dim = new Dimension(256, 256);
 		comp.setPreferredSize(dim);
 		comp.setSize(dim);
@@ -300,7 +302,7 @@ public class Main extends JFrame {
 		// pack();
 		panel.setLayout(new BorderLayout());
 		panel.add(comp, BorderLayout.CENTER);
-
+		System.out.printf("panel,height:%f, width:%d \n",panel.getMaximumSize().getHeight(),panel.getWidth());
 		// Create a simple scene and attach it to the virtual universe
 		// BranchGroup scene = createSceneGraph(isInteractive, isRandom);
 		BranchGroup objRoot = new BranchGroup();
@@ -313,17 +315,12 @@ public class Main extends JFrame {
 		Transform3D t3dTrans = new Transform3D();
 		t3dTrans.setTranslation(new Vector3d(0, 0, -1));
 		objTrans.setTransform(t3dTrans);
-
+		
 		TransformGroup objRot = new TransformGroup();
 		objRot.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
 		objTrans.addChild(objRot);
 		objRoot.addChild(objTrans);
 
-		// Create a simple Shape3D node; add it to the scene graph.
-		// issue 383: changed the cube to a text, so that any graphical problem related
-		// to Yup can be seen.
-		Font3D f3d = new Font3D(new Font("dialog", Font.PLAIN, 1), new FontExtrusion());
-		Text3D text = new Text3D(f3d, "JCanvas3D", new Point3f(-2.3f, -0.5f, 0.f));
 
 		Shape3D sh = new Shape3D();
 		Appearance app = new Appearance();
@@ -343,30 +340,29 @@ public class Main extends JFrame {
 		Shape3D shape = new Shape3D();
 		shape.setGeometry(line.generateLineShape());
 		shape.setAppearance(appearance);
-
 		objRot.addChild(shape);
 
 		BoundingSphere bounds = new BoundingSphere(new Point3d(0.0, 0.0, 0.0), 100.0);
 
 		// Set up the ambient light
-		Color3f ambientColor = new Color3f(0.3f, 0.3f, 0.3f);
-		AmbientLight ambientLightNode = new AmbientLight(ambientColor);
-		ambientLightNode.setInfluencingBounds(bounds);
-		objRoot.addChild(ambientLightNode);
+//		Color3f ambientColor = new Color3f(0.3f, 0.3f, 0.3f);
+//		AmbientLight ambientLightNode = new AmbientLight(ambientColor);
+//		ambientLightNode.setInfluencingBounds(bounds);
+//		objRoot.addChild(ambientLightNode);
 
 		// Set up the directional lights
-		Color3f light1Color = new Color3f(1.0f, 1.0f, 0.9f);
-		Vector3f light1Direction = new Vector3f(1.0f, 1.0f, 1.0f);
-		Color3f light2Color = new Color3f(1.0f, 1.0f, 0.9f);
-		Vector3f light2Direction = new Vector3f(-1.0f, -1.0f, -1.0f);
-
-		DirectionalLight light1 = new DirectionalLight(light1Color, light1Direction);
-		light1.setInfluencingBounds(bounds);
-		objRoot.addChild(light1);
-
-		DirectionalLight light2 = new DirectionalLight(light2Color, light2Direction);
-		light2.setInfluencingBounds(bounds);
-		objRoot.addChild(light2);
+//		Color3f light1Color = new Color3f(1.0f, 1.0f, 0.9f);
+//		Vector3f light1Direction = new Vector3f(1.0f, 1.0f, 1.0f);
+//		Color3f light2Color = new Color3f(1.0f, 1.0f, 0.9f);
+//		Vector3f light2Direction = new Vector3f(-1.0f, -1.0f, -1.0f);
+//
+//		DirectionalLight light1 = new DirectionalLight(light1Color, light1Direction);
+//		light1.setInfluencingBounds(bounds);
+//		objRoot.addChild(light1);
+//
+//		DirectionalLight light2 = new DirectionalLight(light2Color, light2Direction);
+//		light2.setInfluencingBounds(bounds);
+//		objRoot.addChild(light2);
 
 		boolean isInteractive = true;
 		if (true == isInteractive) {
@@ -393,13 +389,16 @@ public class Main extends JFrame {
 			} else {
 				rotationAlpha = new Alpha(-1, 4000);
 			}
-
 			RotationInterpolator rotator = new RotationInterpolator(rotationAlpha, objRot, yAxis, 0.0f,
 					(float) Math.PI * 2.0f);
 
 			rotator.setSchedulingBounds(bounds);
 			objRoot.addChild(rotator);
 		}
+		
+		Background bg=new Background(new Color3f(Color.white));
+		bg.setApplicationBounds(bounds);
+		objRoot.addChild(bg);
 		BranchGroup scene = objRoot;
 
 		SimpleUniverse universe = new SimpleUniverse(canvas.getOffscreenCanvas3D()); // TODO: this is awful and must not

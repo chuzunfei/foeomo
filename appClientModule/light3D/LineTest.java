@@ -46,18 +46,18 @@ public class LineTest extends JFrame{
     public BranchGroup createBranchGroup()
     {
     	
-    JFrame f=new JFrame("数组显示区");
-    f.setUndecorated(true);
-    f.setSize(300,200);
-    jta=new JTextArea();
-    jta.setForeground(Color.red);
-    jta.setBackground(Color.green);
-    f.add(jta);
-    f.setLocation(java.awt.Toolkit.getDefaultToolkit().getScreenSize().width-320,java.awt.Toolkit.getDefaultToolkit().getScreenSize().height-240);
-    f.setResizable(false);
-    f.setAlwaysOnTop(true);
-    f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    f.setVisible(true);
+//    JFrame f=new JFrame("数组显示区");
+//    f.setUndecorated(true);
+//    f.setSize(300,200);
+//    jta=new JTextArea();
+//    jta.setForeground(Color.red);
+//    jta.setBackground(Color.green);
+//    f.add(jta);
+//    f.setLocation(java.awt.Toolkit.getDefaultToolkit().getScreenSize().width-320,java.awt.Toolkit.getDefaultToolkit().getScreenSize().height-240);
+//    f.setResizable(false);
+//    f.setAlwaysOnTop(true);
+//    f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+//    f.setVisible(true);
     
     BranchGroup branchgrouproot = new BranchGroup();
     BoundingSphere bouds=new BoundingSphere(new Point3d(0.0,0.0,0.0),100);
