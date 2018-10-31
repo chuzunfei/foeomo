@@ -1,7 +1,15 @@
 import java.applet.Applet;
+
+import com.sun.image.codec.jpeg.JPEGCodec;
+import com.sun.image.codec.jpeg.JPEGEncodeParam;
+import com.sun.image.codec.jpeg.JPEGImageEncoder;
 import com.sun.j3d.utils.applet.MainFrame;
 import javax.swing.event.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
+
 import com.sun.j3d.utils.universe.*;
 import java.text.*;
 import java.util.ArrayList;
@@ -17,82 +25,11 @@ import com.sun.j3d.utils.behaviors.mouse.*;
 import com.sun.j3d.utils.behaviors.vp.OrbitBehavior;
 import com.sun.j3d.utils.geometry.*;
 
-public class Example extends Applet implements ChangeListener, ActionListener {
+public class Example extends Applet implements ActionListener {
 	public static void main(String[] args) {
-		float initOffScreenScale = 2.5f;
-		for (int i = 0; i < args.length; i++) {
-			if (args[i].equals("-s")) {
-				if (args.length >= (i + 1)) {
-					initOffScreenScale = Float.parseFloat(args[i + 1]);
-					i++;
-				}
-			}
-		}
-		new MainFrame(new Example(true, initOffScreenScale), 950, 600);
+		new MainFrame(new Example(true, 0), 950, 600);
 	}
 
-	public void stateChanged(ChangeEvent e) {
-		JSlider source = (JSlider) e.getSource();
-		int value = source.getValue();
-		if (source == rShoulderSlider) {
-			setRShoulderRot(value);
-			rShoulderSliderLabel.setText(Integer.toString(value));
-		} else if (source == rElbowSlider) {
-			setRElbowRot(value);
-			rElbowSliderLabel.setText(Integer.toString(value));
-		} else if (source == lShoulderSlider) {
-			setLShoulderRot(value);
-			lShoulderSliderLabel.setText(Integer.toString(value));
-		} else if (source == lElbowSlider) {
-			setLElbowRot(value);
-			lElbowSliderLabel.setText(Integer.toString(value));
-		}
-	}
-
-	TransformGroup Human_l_shoulder;
-	TransformGroup Human_l_elbow;
-	TransformGroup Human_skullbase;
-
-	AxisAngle4f rElbowAA = new AxisAngle4f(0.0f, 0.0f, -1.0f, 0.0f);
-	AxisAngle4f lShoulderAA = new AxisAngle4f(0.0f, 0.0f, 1.0f, 0.0f);
-	AxisAngle4f lElbowAA = new AxisAngle4f(0.0f, 0.0f, 1.0f, 0.0f);
-
-	public void setRElbowRot(int rotation) {
-		float angle = (float) Math.toRadians(rotation);
-		rElbowRot = rotation;
-		rElbowAA.angle = (float) Math.toRadians(rElbowRot);
-		Human_r_elbow.getTransform(tmpTrans);
-		tmpTrans.setRotation(rElbowAA);
-		Human_r_elbow.setTransform(tmpTrans);
-	}
-
-	public void setLShoulderRot(int rotation) {
-		lShoulderRot = rotation;
-//		lShoulderAA.angle = (float) Math.toRadians(lShoulderRot);
-		lShoulderAA.setAngle((float) Math.toRadians(lShoulderRot));
-		Human_l_shoulder.getTransform(tmpTrans);
-		tmpTrans.setRotation(lShoulderAA);
-		Human_l_shoulder.setTransform(tmpTrans);
-	}
-
-	public void setLElbowRot(int rotation) {
-		float angle = (float) Math.toRadians(rotation);
-		lElbowRot = rotation;
-		lElbowAA.angle = (float) Math.toRadians(lElbowRot);
-		Human_l_elbow.getTransform(tmpTrans);
-		tmpTrans.setRotation(lElbowAA);
-		Human_l_elbow.setTransform(tmpTrans);
-	}
-
-	public void setRShoulderRot(int rotation) {
-		rShoulderRot = rotation;
-		rShoulderAA.angle = (float) Math.toRadians(rShoulderRot);
-		Human_r_shoulder.getTransform(tmpTrans);
-		tmpTrans.setRotation(rShoulderAA);
-		Human_r_shoulder.setTransform(tmpTrans);
-	}
-
-	AxisAngle4f rShoulderAA = new AxisAngle4f(0.0f, 0.0f, -1.0f, 0.0f);
 
 	public void actionPerformed(ActionEvent e) {
 		System.out.println("action performed has been called...");
@@ -103,7 +40,6 @@ public class Example extends Applet implements ChangeListener, ActionListener {
 
 	public Example(boolean isApplication, float initOffScreenScale) {
 		this.isApplication = isApplication;
-		this.offScreenScale = offScreenScale;
 	}
 
 	public Example() {
@@ -145,63 +81,12 @@ public class Example extends Applet implements ChangeListener, ActionListener {
 		BoundingSphere bounds2 = new BoundingSphere(new Point3d(0.0, 0.0, 0.0), 100.0);
 		orbit.setSchedulingBounds(bounds2);
 		u.getViewingPlatform().setViewPlatformBehavior(orbit);
-		add("East", guiPanel());
 	}
 
 	View view;
 
-	JPanel guiPanel() {
-		JPanel panel = new JPanel();
-		panel.setLayout(new GridLayout(0, 1));
-		panel.add(new JLabel("Right Shoulder rotation"));
-		rShoulderSlider = new JSlider(JSlider.HORIZONTAL, 0, 180, rShoulderRot);
-		rShoulderSlider.addChangeListener(this); // we somehow skipped this the first time around...?!
-		rShoulderSliderLabel = new JLabel(Integer.toString(rShoulderRot));
-		panel.add(rShoulderSlider); // this was for the right shoulder rotation
-		panel.add(rShoulderSliderLabel); // this was for the right shoulder rotation
-		// Human_r_elbow rotation
-		panel.add(new JLabel("Right Elbow rotation"));
-		rElbowSlider = new JSlider(JSlider.HORIZONTAL, 0, 180, rElbowRot);
-		rElbowSlider.addChangeListener(this);
-		rElbowSliderLabel = new JLabel(Integer.toString(rElbowRot));
-		panel.add(rElbowSlider);
-		panel.add(rElbowSliderLabel);
-		// Human_l_shoulder rotation
-		panel.add(new JLabel("Left Shoulder rotation"));
-		lShoulderSlider = new JSlider(JSlider.HORIZONTAL, 0, 180, lShoulderRot);
-		lShoulderSlider.addChangeListener(this);
-		lShoulderSliderLabel = new JLabel(Integer.toString(lShoulderRot));
-		panel.add(lShoulderSlider);
-		panel.add(lShoulderSliderLabel);
-		// Human_l_elbow rotation
-		panel.add(new JLabel("Left Elbow rotation"));
-		lElbowSlider = new JSlider(JSlider.HORIZONTAL, 0, 180, lElbowRot);
-		lElbowSlider.addChangeListener(this);
-		lElbowSliderLabel = new JLabel(Integer.toString(lElbowRot));
-		panel.add(lElbowSlider);
-		panel.add(lElbowSliderLabel);
-		if (isApplication) {
-			JButton snapButton = new JButton(snapImageString);
-			snapButton.setActionCommand(snapImageString);
-			snapButton.addActionListener(this);
-			panel.add(snapButton);
-		}
-		return panel;
-	}
 
 	String snapImageString = "Snap Image";
-	int rShoulderRot = 0;
-	JSlider rShoulderSlider;
-	JLabel rShoulderSliderLabel;
-	int lShoulderRot = 0;
-	JSlider lShoulderSlider;
-	JLabel lShoulderSliderLabel;
-	int rElbowRot = 0;
-	JSlider rElbowSlider;
-	JLabel rElbowSliderLabel;
-	int lElbowRot = 0;
-	JSlider lElbowSlider;
-	JLabel lElbowSliderLabel;
 
 	BranchGroup createSceneGraph() {
 		BranchGroup objRoot = new BranchGroup();
@@ -214,8 +99,6 @@ public class Example extends Applet implements ChangeListener, ActionListener {
 		objTrans.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
 		objTrans.setCapability(TransformGroup.ALLOW_TRANSFORM_READ);
 		objScale.addChild(objTrans);
-//		createHuman();
-//		objTrans.addChild(Human_body);
 		objTrans.addChild(draw3d());
 		BoundingSphere bounds = new BoundingSphere(new Point3d(), 100.0);
 		Background bg = new Background(new Color3f(1.0f, 1.0f, 1.0f));
@@ -345,33 +228,40 @@ public class Example extends Applet implements ChangeListener, ActionListener {
 		// offset and place the cylinder for the l_shoulder
 		tmpTG = new TransformGroup();
 		// offset the shape
-		tmpVector.set(0.0f, -0.5f, 0.0f);
+		tmpVector.set(0.0f, (float)Math.sqrt(1+1+1)/2, 0.0f);
 		tmpTrans.set(tmpVector);
 		tmpTG.setTransform(tmpTrans);
-		tmpCyl = new Cylinder(0.2f, 1.0f, appearance);
+		tmpCyl = new Cylinder(0.1f, (float)Math.sqrt(1+1+1), appearance);
 		tmpTG.addChild(tmpCyl);
 		
 		
 		// add the shape to the l_shoulder
 		cg1.addChild(tmpTG);
-		AxisAngle4f a1 = new AxisAngle4f(0.0f, 0.0f, 1.0f, 0.0f);
-		a1.setAngle((float) Math.toRadians(45));
+		AxisAngle4f z1 = new AxisAngle4f(0.0f, 0.0f, 1.0f, 0.0f);
+		z1.setAngle((float) Math.toRadians(315));
 		cg1.getTransform(tmpTrans);
-//		tmpTrans.setRotation(a1);
+		tmpTrans.setRotation(z1);
+		
+		AxisAngle4f x1 = new AxisAngle4f(1.0f, 0.0f, .0f, 0.0f);
+		x1.setAngle((float) Math.toRadians(36));
+		Transform3D t3d = new Transform3D();
+		t3d.setRotation(x1);
+		tmpTrans.mul(t3d);
 		cg1.setTransform(tmpTrans);
+		
+		
+//		cg1.getTransform(tmpTrans);
+//		tmpTrans.setRotation(x1);
+//		cg1.setTransform(tmpTrans);
 		 
     	 tg.addChild(cg1);
     	 
     	 TransformGroup cg2 = new TransformGroup();
 		 Cylinder cy2 = new Cylinder(0.1f, (float)Math.sqrt(1+1+1) );
 //    	 verts[i] = new Point3f( endpoints.get(i).getX(),  endpoints.get(i).getY(),  endpoints.get(i).getZ());
-		 Transform3D t2 = new Transform3D();
-         t2.rotZ(Math.atan(-3/2 ));
-//         t2.rotX(Math.atan( (endpoints.get(i).getZ()-endpoints.get(i-1).getZ())/(endpoints.get(i).getY()-endpoints.get(i-1).getY()) ));
          Vector3f vec2 = new Vector3f(1,(float) (1+Math.sqrt(3)/2),1);
          Transform3D offset2 = new Transform3D();
          offset2.setTranslation(vec2);
-         t2.mul(offset2);
          cg2.setTransform(offset2 );
 		 cg2.addChild(cy2);
 		 
@@ -380,150 +270,68 @@ public class Example extends Applet implements ChangeListener, ActionListener {
 		return tg;
 	}
 	
-	TransformGroup Human_body;
 	Vector3f tmpVector = new Vector3f();
 	Transform3D tmpTrans = new Transform3D();
 	Color3f red = new Color3f(1.0f, 0.0f, 0.0f);
 	Color3f black = new Color3f(0.0f, 0.0f, 0.0f);
 	Color3f white = new Color3f(1.0f, 1.0f, 1.0f);
 	TransformGroup tmpTG;
-	TransformGroup Human_r_shoulder;
 	Cylinder tmpCyl;
-	Sphere tmpSphere;
-
-	void createHuman() {
-		Human_body = new TransformGroup();
-		tmpVector.set(0.0f, -1.5f, 0.0f);
-		tmpTrans.set(tmpVector);
-//		Human_body.setTransform(tmpTrans);
-		Material material = new Material(red, black, red, white, 64);
-		Appearance appearance = new Appearance();
-		appearance.setMaterial(material);
-		tmpTG = new TransformGroup();
-//		tmpVector.set(0.0f, 1.5f, 0.0f);
-//		tmpTrans.set(tmpVector);
-//		tmpTG.setTransform(tmpTrans);
-//		tmpCyl = new Cylinder(0.75f, 3.0f, appearance);
-//		tmpTG.addChild(tmpCyl);
-//		Human_body.addChild(tmpTG);
-		Human_r_shoulder = new TransformGroup();
-		Human_r_shoulder.setCapability(TransformGroup.ALLOW_TRANSFORM_READ);
-		Human_r_shoulder.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
-		tmpVector.set(-0.95f, 2.9f, -0.2f);
-		tmpTrans.set(tmpVector);
-		Human_r_shoulder.setTransform(tmpTrans);
-		tmpSphere = new Sphere(0.22f, appearance);
-		Human_r_shoulder.addChild(tmpSphere);
-		tmpTG = new TransformGroup();
-		tmpVector.set(0.0f, -0.5f, 0.0f);
-		tmpTrans.set(tmpVector);
-		tmpTG.setTransform(tmpTrans);
-		tmpCyl = new Cylinder(0.2f, 1.0f, appearance);
-		tmpTG.addChild(tmpCyl);
-		Human_r_shoulder.addChild(tmpTG);
-//		Human_body.addChild(Human_r_shoulder);
-
-		// create the r_elbow TransformGroup
-		Human_r_elbow = new TransformGroup();
-		Human_r_elbow.setCapability(TransformGroup.ALLOW_TRANSFORM_READ);
-		Human_r_elbow.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
-		tmpVector.set(0.0f, -1.054f, 0.0f);
-		tmpTrans.set(tmpVector);
-		Human_r_elbow.setTransform(tmpTrans);
-
-		// place the sphere for the r_elbow
-		tmpSphere = new Sphere(0.22f, appearance);
-		Human_r_elbow.addChild(tmpSphere);
-
-		// offset and place the cylinder for the r_shoulder
-		tmpTG = new TransformGroup();
-		// offset the shape
-		tmpVector.set(0.0f, -0.5f, 0.0f);
-		tmpTrans.set(tmpVector);
-		tmpTG.setTransform(tmpTrans);
-		tmpCyl = new Cylinder(0.2f, 1.0f, appearance);
-		tmpTG.addChild(tmpCyl);
-
-		// add the shape to the r_shoulder
-		Human_r_elbow.addChild(tmpTG);
-
-		// add the elbow to the shoulder group
-		Human_r_shoulder.addChild(Human_r_elbow);
-
-		// create the l_shoulder TransformGroup
-		Human_l_shoulder = new TransformGroup();
-		Human_l_shoulder.setCapability(TransformGroup.ALLOW_TRANSFORM_READ);
-		Human_l_shoulder.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
-		tmpVector.set(1.95f, 2.9f, -0.2f);
-		tmpTrans.set(tmpVector);
-		Human_l_shoulder.setTransform(tmpTrans);
-
-		// place the sphere for the l_shoulder
-		tmpSphere = new Sphere(0.22f, appearance);
-//		Human_l_shoulder.addChild(tmpSphere);
-
-		// offset and place the cylinder for the l_shoulder
-		tmpTG = new TransformGroup();
-		// offset the shape
-		tmpVector.set(0.0f, -0.5f, 0.0f);
-		tmpTrans.set(tmpVector);
-		tmpTG.setTransform(tmpTrans);
-		tmpCyl = new Cylinder(0.2f, 1.0f, appearance);
-		tmpTG.addChild(tmpCyl);
-
-		// add the shape to the l_shoulder
-		Human_l_shoulder.addChild(tmpTG);
-
-		// add the shoulder to the body group
-		Human_body.addChild(Human_l_shoulder);
-
-		// create the r_elbow TransformGroup
-		Human_l_elbow = new TransformGroup();
-		Human_l_elbow.setCapability(TransformGroup.ALLOW_TRANSFORM_READ);
-		Human_l_elbow.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
-		tmpVector.set(0.0f, -1.054f, 0.0f);
-		tmpTrans.set(tmpVector);
-		Human_l_elbow.setTransform(tmpTrans);
-
-		// place the sphere for the l_elbow
-		tmpSphere = new Sphere(0.22f, appearance);
-		Human_l_elbow.addChild(tmpSphere);
-
-		// offset and place the cylinder for the l_elbow
-		tmpTG = new TransformGroup();
-		// offset the shape
-		tmpVector.set(0.0f, -0.5f, 0.0f);
-		tmpTrans.set(tmpVector);
-		tmpTG.setTransform(tmpTrans);
-		tmpCyl = new Cylinder(0.2f, 1.0f, appearance);
-		tmpTG.addChild(tmpCyl);
-
-		// add the shape to the l_elbow
-		Human_l_elbow.addChild(tmpTG);
-
-		// add the shoulder to the body group
-//		Human_l_shoulder.addChild(Human_l_elbow);
-
-		// create the skullbase TransformGroup
-		Human_skullbase = new TransformGroup();
-		tmpVector.set(0.0f, 3.632f, 0.0f);
-		tmpTrans.set(tmpVector);
-		Human_skullbase.setTransform(tmpTrans);
-
-		// offset and place the sphere for the skull
-		tmpSphere = new Sphere(0.5f, appearance);
-
-		// add the shape to the l_shoulder
-		Human_skullbase.addChild(tmpSphere);
-
-		// add the shoulder to the body group
-//		Human_body.addChild(Human_skullbase);
-
-	}
-
-	TransformGroup Human_r_elbow;
 
 	public void destroy() {
 		u.removeAllLocales();
 	}
+	
+}
+
+class OffScreenCanvas3D extends Canvas3D {
+
+	  OffScreenCanvas3D(GraphicsConfiguration graphicsConfiguration,
+	      boolean offScreen) {
+
+	    super(graphicsConfiguration, offScreen);
+	  }
+
+	  private BufferedImage doRender(int width, int height) {
+
+	    BufferedImage bImage = new BufferedImage(width, height,
+	        BufferedImage.TYPE_INT_RGB);
+
+	    ImageComponent2D buffer = new ImageComponent2D(
+	        ImageComponent.FORMAT_RGB, bImage);
+	    //buffer.setYUp(true);
+
+	    setOffScreenBuffer(buffer);
+	    renderOffScreenBuffer();
+	    waitForOffScreenRendering();
+	    bImage = getOffScreenBuffer().getImage();
+	    return bImage;
+	  }
+
+	  void snapImageFile(String filename, int width, int height) {
+	    BufferedImage bImage = doRender(width, height);
+
+	    /*
+	     * JAI: RenderedImage fImage = JAI.create("format", bImage,
+	     * DataBuffer.TYPE_BYTE); JAI.create("filestore", fImage, filename +
+	     * ".tif", "tiff", null);
+	     */
+
+	    /* No JAI: */
+	    try {
+	      FileOutputStream fos = new FileOutputStream(filename + ".jpg");
+	      BufferedOutputStream bos = new BufferedOutputStream(fos);
+
+	      JPEGImageEncoder jie = JPEGCodec.createJPEGEncoder(bos);
+	      JPEGEncodeParam param = jie.getDefaultJPEGEncodeParam(bImage);
+	      param.setQuality(1.0f, true);
+	      jie.setJPEGEncodeParam(param);
+	      jie.encode(bImage);
+
+	      bos.flush();
+	      fos.close();
+	    } catch (Exception e) {
+	      System.out.println(e);
+	    }
+	  }
 }
