@@ -234,19 +234,18 @@ public class Example extends Applet implements ActionListener {
 		tmpCyl = new Cylinder(0.1f, (float)Math.sqrt(1+1+1), appearance);
 		tmpTG.addChild(tmpCyl);
 		
-		
 		// add the shape to the l_shoulder
 		cg1.addChild(tmpTG);
-		AxisAngle4f z1 = new AxisAngle4f(0.0f, 0.0f, 1.0f, 0.0f);
+		AxisAngle4f z1 = new AxisAngle4f(1.0f, 0.0f, 0.0f, 0.0f);
 		z1.setAngle((float) Math.toRadians(315));
 		cg1.getTransform(tmpTrans);
-		tmpTrans.setRotation(z1);
+		tmpTrans.setRotation(makeQuat4f(Math.PI/4,0,Math.PI*7/4));
 		
 		AxisAngle4f x1 = new AxisAngle4f(1.0f, 0.0f, .0f, 0.0f);
-		x1.setAngle((float) Math.toRadians(36));
+		x1.setAngle((float) Math.toRadians(315));
 		Transform3D t3d = new Transform3D();
-		t3d.setRotation(x1);
-		tmpTrans.mul(t3d);
+		t3d.setRotation(new Quat4f((float) Math.sin(45/2) ,1.0f ,(float) -Math.sin(45/2) ,(float) Math.cos(45/2)));
+//		tmpTrans.mul(t3d);
 		cg1.setTransform(tmpTrans);
 		
 		
@@ -268,6 +267,25 @@ public class Example extends Applet implements ActionListener {
     	 tg.addChild(cg2);
 		
 		return tg;
+	}
+	
+	/*
+	 *  x = sin(Y/2)sin(Z/2)cos(X/2)+cos(Y/2)cos(Z/2)sin(X/2)
+		y = sin(Y/2)cos(Z/2)cos(X/2)+cos(Y/2)sin(Z/2)sin(X/2)
+		z = cos(Y/2)sin(Z/2)cos(X/2)-sin(Y/2)cos(Z/2)sin(X/2)
+		w = cos(Y/2)cos(Z/2)cos(X/2)-sin(Y/2)sin(Z/2)sin(X/2)
+		q = ((x, y, z), w)
+	 */
+	private Quat4f makeQuat4f(double anglex,double angley,double anglez) {
+		float x = (float) (Math.sin(angley/2)*Math.sin(anglez/2)*Math.cos(anglex/2) + Math.cos(angley/2)*Math.cos(anglez/2)*Math.sin(anglex/2));
+		float y = (float) (Math.sin(angley/2)*Math.cos(anglez/2)*Math.cos(anglex/2) + Math.cos(angley/2)*Math.sin(anglez/2)*Math.sin(anglex/2));
+		float z = (float) (Math.cos(angley/2)*Math.sin(anglez/2)*Math.cos(anglex/2) - Math.sin(angley/2)*Math.cos(anglez/2)*Math.sin(anglex/2));
+		float w = (float) (Math.cos(angley/2)*Math.cos(anglez/2)*Math.cos(anglex/2) - Math.sin(angley/2)*Math.sin(anglez/2)*Math.sin(anglex/2));
+		System.out.println(x);
+		System.out.println(y);
+		System.out.println(z);
+		System.out.println(w);
+		return new Quat4f(x,y,z,w);
 	}
 	
 	Vector3f tmpVector = new Vector3f();
