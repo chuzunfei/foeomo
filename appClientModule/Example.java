@@ -28,6 +28,7 @@ import com.sun.j3d.utils.geometry.*;
 public class Example extends Applet implements ActionListener {
 	public static void main(String[] args) {
 		new MainFrame(new Example(true, 0), 950, 600);
+//		new Example().makeQuat4f(0, Math.PI/2, 0);
 	}
 
 
@@ -217,7 +218,7 @@ public class Example extends Applet implements ActionListener {
 		 
 		 cg1.setCapability(TransformGroup.ALLOW_TRANSFORM_READ);
 		 cg1.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
-		tmpVector.set(0f, 0f, 0f);
+		tmpVector.set(0f, 1f, 0f);
 		tmpTrans.set(tmpVector);
 		cg1.setTransform(tmpTrans);
 		
@@ -228,24 +229,19 @@ public class Example extends Applet implements ActionListener {
 		// offset and place the cylinder for the l_shoulder
 		tmpTG = new TransformGroup();
 		// offset the shape
-		tmpVector.set(0.0f, (float)Math.sqrt(1+1+1)/2, 0.0f);
+		tmpVector.set(0.0f, (float)Math.sqrt(1+0+1)/2, 0.0f);
 		tmpTrans.set(tmpVector);
 		tmpTG.setTransform(tmpTrans);
-		tmpCyl = new Cylinder(0.1f, (float)Math.sqrt(1+1+1), appearance);
+		tmpCyl = new Cylinder(0.1f, (float)Math.sqrt(1+0+1), appearance);
 		tmpTG.addChild(tmpCyl);
 		
 		// add the shape to the l_shoulder
 		cg1.addChild(tmpTG);
 		AxisAngle4f z1 = new AxisAngle4f(1.0f, 0.0f, 0.0f, 0.0f);
-		z1.setAngle((float) Math.toRadians(315));
+		z1.setAngle((float) Math.toRadians(270));
 		cg1.getTransform(tmpTrans);
-		tmpTrans.setRotation(makeQuat4f(Math.PI/4,0,Math.PI*7/4));
+		tmpTrans.setRotation(makeQuat4f(Math.PI/4,0,Math.PI*3/2));
 		
-		AxisAngle4f x1 = new AxisAngle4f(1.0f, 0.0f, .0f, 0.0f);
-		x1.setAngle((float) Math.toRadians(315));
-		Transform3D t3d = new Transform3D();
-		t3d.setRotation(new Quat4f((float) Math.sin(45/2) ,1.0f ,(float) -Math.sin(45/2) ,(float) Math.cos(45/2)));
-//		tmpTrans.mul(t3d);
 		cg1.setTransform(tmpTrans);
 		
 		
