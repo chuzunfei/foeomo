@@ -13,6 +13,7 @@ import java.io.FileOutputStream;
 import com.sun.j3d.utils.universe.*;
 import java.text.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.awt.*;
 import javax.media.j3d.*;
 import javax.swing.*;
@@ -90,10 +91,11 @@ public class Example extends Applet implements ActionListener {
 	String snapImageString = "Snap Image";
 
 	BranchGroup createSceneGraph() {
+		
 		BranchGroup objRoot = new BranchGroup();
 		TransformGroup objScale = new TransformGroup();
 		Transform3D scaleTrans = new Transform3D();
-		scaleTrans.set(1 / 3.5f);
+		scaleTrans.set(1 / 16.5f);
 		objScale.setTransform(scaleTrans);
 		objRoot.addChild(objScale);
 		TransformGroup objTrans = new TransformGroup();
@@ -128,11 +130,11 @@ public class Example extends Applet implements ActionListener {
 		  
 	    float vert[] = {   
 	    		 0.0f,0.0f,0.0f,  
-	 	        5f,0.0f,0.0f,  
+	 	        15f,0.0f,0.0f,  
 	 	        0.0f,0.0f,0.0f,  
-	 	        0.0f,5.0f,0.0f,  
+	 	        0.0f,15.0f,0.0f,  
 	 	        0.0f,0.0f,0.0f,  
-	 	        0.0f,0.0f,5.0f,  
+	 	        0.0f,0.0f,15.0f,  
 	       };  
 	  
 	    float color[] = {  
@@ -170,7 +172,7 @@ public class Example extends Applet implements ActionListener {
 		Point point = new Point();
 		point.setX(0);
 		point.setY(0);
-		point.setZ(0);
+		point.setZ((float) 0.5);
 		line.getEndpoints().add(point);
 		Point point1 = new Point();
 		point1.setX(0);
@@ -183,85 +185,44 @@ public class Example extends Applet implements ActionListener {
 		point2.setZ(1);
 		line.getEndpoints().add(point2);
 
-		TransformGroup objTrans = new TransformGroup();
-//		Transform3D t3dTrans = new Transform3D();
-//		t3dTrans.setTranslation(new Vector3d(0, 0, -1));
-//		objTrans.setTransform(t3dTrans);
-		
-//		objTrans.addChild(generateCylinder());
-//		objRot.addChild(line.generateLineShape());
-		
-		return generateCylinder();
+		return generateCylinder(line.getEndpoints());
 	}
-	public TransformGroup generateCylinder() {
+
+	public TransformGroup generateCylinder(List<Point> pList) {
 		TransformGroup tg = new TransformGroup();
 		tg.addChild(addAixs());
-		
-		 TransformGroup cg1 = new TransformGroup();
-//		 cg1.setCapability(TransformGroup.ALLOW_TRANSFORM_READ);
-//		 cg1.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
-//		 Cylinder cy1 = new Cylinder(0.1f, (float)Math.sqrt(3) );
-//		//    	 verts[i] = new Point3f( endpoints.get(i).getX(),  endpoints.get(i).getY(),  endpoints.get(i).getZ());
-//		 Transform3D t1 = new Transform3D();
-//		//         t1.rotZ(Math.atan());
-//		 t1.rotX(Math.atan(1/2));
-//		 Transform3D offset1 = new Transform3D();
-//		 Vector3f vec1 = new Vector3f(0,(float)Math.sqrt(3)/2,0);
-//		 offset1.setTranslation(vec1);
-//		 cg1.setTransform(offset1);
-//		 AxisAngle4f a1 = new AxisAngle4f(0.0f, 0.0f, 1.0f, 0.0f);
-//		 a1.setAngle((float) Math.toRadians(45));
-//		 cg1.getTransform(offset1);
-//		 offset1.setRotation(a1);
-//		 cg1.setTransform(offset1);
-//		 cg1.addChild(cy1);
-		 
-		 cg1.setCapability(TransformGroup.ALLOW_TRANSFORM_READ);
-		 cg1.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
-		tmpVector.set(0f, 1f, 0f);
-		tmpTrans.set(tmpVector);
-		cg1.setTransform(tmpTrans);
-		
 		Material material = new Material(red, black, red, white, 64);
 		Appearance appearance = new Appearance();
 		appearance.setMaterial(material);
-		
-		// offset and place the cylinder for the l_shoulder
-		tmpTG = new TransformGroup();
-		// offset the shape
-		tmpVector.set(0.0f, (float)Math.sqrt(1+0+1)/2, 0.0f);
-		tmpTrans.set(tmpVector);
-		tmpTG.setTransform(tmpTrans);
-		tmpCyl = new Cylinder(0.1f, (float)Math.sqrt(1+0+1), appearance);
-		tmpTG.addChild(tmpCyl);
-		
-		// add the shape to the l_shoulder
-		cg1.addChild(tmpTG);
-		AxisAngle4f z1 = new AxisAngle4f(1.0f, 0.0f, 0.0f, 0.0f);
-		z1.setAngle((float) Math.toRadians(270));
-		cg1.getTransform(tmpTrans);
-		tmpTrans.setRotation(makeQuat4f(Math.PI/4,0,Math.PI*3/2));
-		
-		cg1.setTransform(tmpTrans);
-		
-		
-//		cg1.getTransform(tmpTrans);
-//		tmpTrans.setRotation(x1);
-//		cg1.setTransform(tmpTrans);
-		 
-    	 tg.addChild(cg1);
-    	 
-    	 TransformGroup cg2 = new TransformGroup();
-		 Cylinder cy2 = new Cylinder(0.1f, (float)Math.sqrt(1+1+1) );
-//    	 verts[i] = new Point3f( endpoints.get(i).getX(),  endpoints.get(i).getY(),  endpoints.get(i).getZ());
-         Vector3f vec2 = new Vector3f(1,(float) (1+Math.sqrt(3)/2),1);
-         Transform3D offset2 = new Transform3D();
-         offset2.setTranslation(vec2);
-         cg2.setTransform(offset2 );
-		 cg2.addChild(cy2);
-		 
-    	 tg.addChild(cg2);
-		
+		for (int i=1;i<pList.size();i++) {
+			Point p1 = pList.get(i-1);
+			Point p2 = pList.get(i);
+			double len = Point.distance(p1, p2);
+			
+			TransformGroup cg = new TransformGroup();
+			cg.setCapability(TransformGroup.ALLOW_TRANSFORM_READ);
+			cg.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
+			
+			tmpVector.set((float) p1.getX(), (float) p1.getY(), (float) p1.getZ());
+			tmpTrans.set(tmpVector);
+			cg.setTransform(tmpTrans);
+
+			tmpTG = new TransformGroup();
+			tmpVector.set(0, (float) len/2, 0);
+			tmpTrans.set(tmpVector);
+//			tmpTrans.setScale(0.1);
+			tmpTG.setTransform(tmpTrans);
+			tmpCyl = new Cylinder(0.1f, (float) len, appearance);
+			tmpTG.addChild(tmpCyl);
+			cg.addChild(tmpTG);
+
+			cg.getTransform(tmpTrans);
+			tmpTrans.setRotation(makeAA(p1, p2, len));
+			cg.setTransform(tmpTrans);
+
+			tg.addChild(cg);
+		}
+
 		return tg;
 	}
 	
@@ -282,6 +243,23 @@ public class Example extends Applet implements ActionListener {
 		System.out.println(z);
 		System.out.println(w);
 		return new Quat4f(x,y,z,w);
+	}
+	
+	private AxisAngle4d makeAA(Point s, Point d, double len) {
+		AxisAngle4d aa = new AxisAngle4d();
+		if (len == 0) {
+			len = Math.sqrt(Math.pow(d.getX()-s.getX(), 2) + Math.pow(d.getY()-s.getY(), 2) + Math.pow(d.getZ()-s.getZ(), 2));
+		}
+		Vector3d vs = new Vector3d(0, len, 0);
+		Vector3d vd = new Vector3d(d.getX()-s.getX(), d.getY()-s.getY(), d.getZ()-s.getZ());
+		
+		Vector3d vr = new Vector3d();
+		vr.cross(vs, vd);
+		double angle = Math.acos(vs.dot(vd)/(vs.length()*vd.length()));
+		
+		aa.set(vr, angle);
+		
+		return aa;
 	}
 	
 	Vector3f tmpVector = new Vector3f();
