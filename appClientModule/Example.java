@@ -26,10 +26,20 @@ import com.sun.j3d.utils.behaviors.mouse.*;
 import com.sun.j3d.utils.behaviors.vp.OrbitBehavior;
 import com.sun.j3d.utils.geometry.*;
 
-public class Example extends Applet implements ActionListener {
+public class Example extends JFrame implements ActionListener {
 	public static void main(String[] args) {
-		new MainFrame(new Example(true, 0), 950, 600);
+//		new MainFrame(new Example(true, 0), 950, 600);
 //		new Example().makeQuat4f(0, Math.PI/2, 0);
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					Main frame = new Main();
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 
 
@@ -153,7 +163,7 @@ public class Example extends Applet implements ActionListener {
           line.setCoordinates(0,vert);  
           line.setColors(0,color);  
         LineAttributes la = new LineAttributes();  
-          la.setLineWidth(30.0f);  
+          la.setLineWidth(3.0f);  
           la.setLineAntialiasingEnable(true);  
           la.setLinePattern(LineAttributes.PATTERN_SOLID);  
         Appearance ap = new Appearance();  
