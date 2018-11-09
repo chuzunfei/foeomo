@@ -38,6 +38,7 @@ import javax.media.j3d.Group;
 import javax.media.j3d.LineAttributes;
 import javax.media.j3d.LineStripArray;
 import javax.media.j3d.Material;
+import javax.media.j3d.QuadArray;
 import javax.media.j3d.RotationInterpolator;
 import javax.media.j3d.Shape3D;
 import javax.media.j3d.Text3D;
@@ -75,6 +76,8 @@ import javax.vecmath.Vector3f;
 
 import org.fem.object.Line;
 import org.fem.object.Point;
+import org.fem.util.RotateUtil;
+import org.jdesktop.j3d.examples.four_by_four.Cube;
 
 import com.sun.j3d.exp.swing.JCanvas3D;
 import com.sun.j3d.utils.behaviors.mouse.MouseBehavior;
@@ -334,6 +337,7 @@ public class Main extends JFrame {
 		objTrans.setCapability(TransformGroup.ALLOW_TRANSFORM_READ);
 		objScale.addChild(objTrans);
 		objTrans.addChild(draw3d());
+//		objRoot.addChild(cube());
 		BoundingSphere bounds = new BoundingSphere(new Point3d(), 100.0);
 		Background bg = new Background(new Color3f(1.0f, 1.0f, 1.0f));
 		bg.setApplicationBounds(bounds);
@@ -403,16 +407,16 @@ public class Main extends JFrame {
 		Point point = new Point();
 		point.setX(0);
 		point.setY(0);
-		point.setZ((float) 0.5);
+		point.setZ((float) 0);
 		line.getEndpoints().add(point);
 		Point point1 = new Point();
-		point1.setX(0);
-		point1.setY(0);
-		point1.setZ(1);
+		point1.setX(5);
+		point1.setY(3);
+		point1.setZ(6);
 		line.getEndpoints().add(point1);
 		Point point2 = new Point();
-		point2.setX(2);
-		point2.setY(3);
+		point2.setX(10);
+		point2.setY(9);
 		point2.setZ(1);
 		line.getEndpoints().add(point2);
 
@@ -446,12 +450,13 @@ public class Main extends JFrame {
 			tmpTrans.set(tmpVector);
 //			tmpTrans.setScale(0.1);
 			tmpTG.setTransform(tmpTrans);
-			Cylinder tmpCyl = new Cylinder(0.1f, (float) len, appearance);
-			tmpTG.addChild(tmpCyl);
+//			Cylinder tmpCyl = new Cylinder(0.1f, (float) len, appearance);
+			Shape3D shape = cube(0.2f, (float) len, appearance);
+			tmpTG.addChild(shape);
 			cg.addChild(tmpTG);
 
 			cg.getTransform(tmpTrans);
-			tmpTrans.setRotation(makeAA(p1, p2, len));
+			tmpTrans.setRotation(RotateUtil.makeAxisAngle4d(p1, p2, len));
 			cg.setTransform(tmpTrans);
 
 			tg.addChild(cg);
@@ -460,42 +465,74 @@ public class Main extends JFrame {
 		return tg;
 	}
 	
-	/*
-	 *  x = sin(Y/2)sin(Z/2)cos(X/2)+cos(Y/2)cos(Z/2)sin(X/2)
-		y = sin(Y/2)cos(Z/2)cos(X/2)+cos(Y/2)sin(Z/2)sin(X/2)
-		z = cos(Y/2)sin(Z/2)cos(X/2)-sin(Y/2)cos(Z/2)sin(X/2)
-		w = cos(Y/2)cos(Z/2)cos(X/2)-sin(Y/2)sin(Z/2)sin(X/2)
-		q = ((x, y, z), w)
-	 */
-	private Quat4f makeQuat4f(double anglex,double angley,double anglez) {
-		float x = (float) (Math.sin(angley/2)*Math.sin(anglez/2)*Math.cos(anglex/2) + Math.cos(angley/2)*Math.cos(anglez/2)*Math.sin(anglex/2));
-		float y = (float) (Math.sin(angley/2)*Math.cos(anglez/2)*Math.cos(anglex/2) + Math.cos(angley/2)*Math.sin(anglez/2)*Math.sin(anglex/2));
-		float z = (float) (Math.cos(angley/2)*Math.sin(anglez/2)*Math.cos(anglex/2) - Math.sin(angley/2)*Math.cos(anglez/2)*Math.sin(anglex/2));
-		float w = (float) (Math.cos(angley/2)*Math.cos(anglez/2)*Math.cos(anglex/2) - Math.sin(angley/2)*Math.sin(anglez/2)*Math.sin(anglex/2));
-		System.out.println(x);
-		System.out.println(y);
-		System.out.println(z);
-		System.out.println(w);
-		return new Quat4f(x,y,z,w);
+	private Shape3D cube(float border, float len, Appearance appearance) {
+		float half = border/2;
+		float yPos = len/2;
+		final float[] verts = {
+				// Front Face
+				half, -len/2, half, half, len/2, half, 
+				-half, len/2, half, -half, -len/2, half,
+				// Back Face
+				-half, -yPos, -half, -half, yPos, -half, 
+				half, yPos, -half, half, -yPos, -half,
+				// Right Face
+				half, -yPos, -half, half, yPos, -half, 
+				half, yPos, half, half, -yPos, half,
+				// Left Face
+				-half, -yPos, half, -half, yPos, half, 
+				-half, yPos, -half, -half, -yPos, -half,
+				// Top Face
+				half, yPos, half, half, yPos, -half, 
+				-half, yPos, -half, -half, yPos, half,
+				// Bottom Face
+				-half, -yPos, half, -half, -yPos, -half, 
+				half, -yPos, -half, half, -yPos, half, };
+
+		final float[] normals = {
+				// Front Face
+				0.0f, 0.0f, 1.0f, 
+				0.0f, 0.0f, 1.0f, 
+				0.0f, 0.0f, 1.0f, 
+				0.0f, 0.0f, 1.0f,
+				// Back Face
+				0.0f, 0.0f, -1.0f, 
+				0.0f, 0.0f, -1.0f, 
+				0.0f, 0.0f, -1.0f, 
+				0.0f, 0.0f, -1.0f,
+				// Right Face
+				1.0f, 0.0f, 0.0f, 
+				1.0f, 0.0f, 0.0f, 
+				1.0f, 0.0f, 0.0f, 
+				1.0f, 0.0f, 0.0f,
+				// Left Face
+				-1.0f, 0.0f, 0.0f, 
+				-1.0f, 0.0f, 0.0f, 
+				-1.0f, 0.0f, 0.0f, 
+				-1.0f, 0.0f, 0.0f,
+				// Top Face
+				0.0f, 1.0f, 0.0f, 
+				0.0f, 1.0f, 0.0f, 
+				0.0f, 1.0f, 0.0f, 
+				0.0f, 1.0f, 0.0f,
+				// Bottom Face
+				0.0f, -1.0f, 0.0f, 
+				0.0f, -1.0f, 0.0f, 
+				0.0f, -1.0f, 0.0f, 
+				0.0f, -1.0f, 0.0f, };
+		QuadArray quadArray = new QuadArray(24,
+				QuadArray.COORDINATES | QuadArray.NORMALS | QuadArray.TEXTURE_COORDINATE_2);
+		quadArray.setCoordinates(0, verts);
+		quadArray.setNormals(0, normals);
+
+		Shape3D shape3D = new Shape3D(quadArray, appearance);
+		shape3D.setCapability(Shape3D.ALLOW_GEOMETRY_READ);
+		shape3D.setCapability(Shape3D.ALLOW_GEOMETRY_WRITE);
+		shape3D.setCapability(Shape3D.ALLOW_APPEARANCE_READ);
+		shape3D.setCapability(Shape3D.ALLOW_APPEARANCE_WRITE);
+
+		return shape3D;
 	}
-	
-	private AxisAngle4d makeAA(Point s, Point d, double len) {
-		AxisAngle4d aa = new AxisAngle4d();
-		if (len == 0) {
-			len = Math.sqrt(Math.pow(d.getX()-s.getX(), 2) + Math.pow(d.getY()-s.getY(), 2) + Math.pow(d.getZ()-s.getZ(), 2));
-		}
-		Vector3d vs = new Vector3d(0, len, 0);
-		Vector3d vd = new Vector3d(d.getX()-s.getX(), d.getY()-s.getY(), d.getZ()-s.getZ());
-		
-		Vector3d vr = new Vector3d();
-		vr.cross(vs, vd);
-		double angle = Math.acos(vs.dot(vd)/(vs.length()*vd.length()));
-		
-		aa.set(vr, angle);
-		
-		return aa;
-	}
-	
+
 	BranchGroup createSceneGraphOld(JCanvas3D canvas) {
 		BranchGroup objRoot = new BranchGroup();
 		
